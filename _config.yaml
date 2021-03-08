@@ -1,0 +1,29 @@
+db:
+  cxn: **
+  userSchema: { 
+    'SummonerId': '',    
+    'SummonerName': '',
+    'DiscordName': '',
+    'Points': ''
+  }
+  userMatchSchema: {
+    'MatchId': '',
+    'SummonerId': '',
+    'ChampionId': '', 
+    'ParticipantId': '',
+    'TeamId': ''
+  }
+  matchSchema: {
+    'MatchId':'',
+    'TeamBlue': [],
+    'TeamRed': [],
+    'winner': ''
+  }
+
+discord:
+  apiKey: **
+
+riot:
+  apiKey: '**'
+  redTeamId: '200'
+  blueTeamId: '100'
