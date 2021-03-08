@@ -30,7 +30,16 @@ class RiotApi:
         )
         return response.json()['id']
 
+    def findGame(self, summonerId: str):
+        game = GameWatcher(self._apiKey, summonerId, self._baseUrl)
+
+        while game._matchId == "":
+            break
+        print("found match?")
+        return game._matchId
+
     def getActiveGame(self, summonerId: str):
+        self.findGame(summonerId)
         requestUrl = f"{self._baseUrl}spectator/v4/active-games/by-summoner/{summonerId}"
         response = requests.get(
             requestUrl,
@@ -52,41 +61,38 @@ class RiotApi:
 
 
 class GameWatcher:
-    def __init__(self, self, apiKey: str, summonerId: str):
+    def __init__(self, apiKey: str, summonerId: str, baseUrl: str):
 
         self._apiKey = apiKey
         self._summonerId = summonerId
         self._matchId = ""
-        self._isActive = False
+        self._baseUrl = baseUrl
 
         @property
         def matchId(self):
             return self._matchId
 
-        @property
-        def isActive(self):
-            """Property to designate if the bot is already watching a game"""
-            return self._isActive
-
         self._timer = None
-        self.interval = 60
+        self.interval = 1
         self.is_running = False
         self.next_call = time.time()
         self.start()
 
-     def pingSpectator(self):
+    def pingSpectator(self):
         """ Get response Code from spectator API """
         requestUrl = f"{self._baseUrl}spectator/v4/active-games/by-summoner/{self._summonerId}"
         response = requests.get(
             requestUrl,
             headers={"X-Riot-Token": self._apiKey},
         )
+        print(response)
         if response.status_code == 200:
             self.stop()
-            return response.json()['gameId']
+            self._matchId = response.json()['gameId']
+            print("actually found the game :) ")
 
         else:
-            return False
+            print('TRYING AGAIN OKAY?')
 
     def start(self):
         if not self.is_running:

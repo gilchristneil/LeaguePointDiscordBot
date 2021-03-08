@@ -78,35 +78,36 @@ async def watchGame(ctx):
     """Tells Bot to watch next game of caller for points"""
     summonerId = dbHelper.getSummonerIdFromDiscordName(
         ctx.message.author.display_name)
-    matchData = riotApi.getActiveGame(summonerId)
-    if matchData == False:
-        return
-    redTeam = []
-    blueTeam = []
+    matchData = riotApi.findGame(summonerId)
+    print(matchData)
 
-    for player in matchData['participants']:
-        if player["teamId"] == 100:
-            redTeam.append(player['summonerName'])
-        elif player["teamId"] == 200:
-            blueTeam.append(player['summonerName'])
-        userMatch = copy(cfg['db']['userMatchSchema'])
-        userMatch = {
-            'MatchId': matchData['gameId'],
-            'SummonerId': player['summonerId'],
-            'ChampionId': player['championId'],
-            'ParticipantId': '',
-            'TeamId': player["teamId"]
-        }
-        userMatchDocId = self._db.UserMatch.insert_one(userMatch).inserted_id
-        return 0
-    match = copy(cfg['db']['matchSchema'])
-    match = {
-        'MatchId': matchData['gameId'],
-        'TeamBlue': blueTeam,
-        'TeamRed': redTeam,
-        'winner': ''
-    }
-    matchDocId = self._db.Match.insert_one(match).inserted_id
+    # redTeam = []
+    # blueTeam = []
+    # print(matchData)
+    # for player in matchData['participants']:
+    #     if player["teamId"] == 100:
+    #         redTeam.append(player['summonerName'])
+    #     elif player["teamId"] == 200:
+    #         blueTeam.append(player['summonerName'])
+    #     userMatch = copy(cfg['db']['userMatchSchema'])
+    #     userMatch = {
+    #         'MatchId': matchData['gameId'],
+    #         'SummonerId': player['summonerId'],
+    #         'ChampionId': player['championId'],
+    #         'ParticipantId': '',
+    #         'TeamId': player["teamId"]
+    #     }
+    #     userMatchDocId = self._db.UserMatch.insert_one(userMatch).inserted_id
+    #     return 0
+
+    # match = copy(cfg['db']['matchSchema'])
+    # match = {
+    #     'MatchId': matchData['gameId'],
+    #     'TeamBlue': blueTeam,
+    #     'TeamRed': redTeam,
+    #     'winner': ''
+    # }
+    # matchDocId = self._db.Match.insert_one(match).inserted_id
     return 0
 
 

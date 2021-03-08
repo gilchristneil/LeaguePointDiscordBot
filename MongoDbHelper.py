@@ -22,16 +22,13 @@ class DbHelper:
         _db = _client.leaguetournamentbot
         return _db
 
+    # QUERIES #
+
     def doesSummonerExist(self, summonerName):
         """Returns Bool -> if summoner name is already claimed by a discord member"""
         user = self._db.User.count_documents(
             {'SummonerName': summonerName}, limit=1)
         return bool(user)
-
-    def getSummonerIdFromDiscordName(self, discordName):
-        summonerId = self._db.User.find_one(
-            {'DiscordName': discordName})
-        return summonerId
 
     def doesDiscordUserExist(self, discordName):
         """Returns Bool -> if discord member is already attributed to a summoner name"""
@@ -39,11 +36,18 @@ class DbHelper:
             {'DiscordName': discordName}, limit=1)
         return bool(user)
 
+    def getSummonerIdFromDiscordName(self, discordName):
+        summonerId = self._db.User.find_one(
+            {'DiscordName': discordName})
+        return summonerId
+
     def getDiscordNameFromSummonerName(self, summonerName):
         """Returns the Discord name from query of summoner name -> used to setting up the game watch"""
         discordName = self._db.User.find_one(
             {'SummonerName': summonerName.upper()})
         return discordName
+
+    # COMMANDS #
 
     def addSummoner(self, summonerId, summonerName, discordName):
         """Add Summoner to the database"""
