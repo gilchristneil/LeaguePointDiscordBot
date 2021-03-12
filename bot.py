@@ -124,4 +124,4 @@ async def help(ctx):
         helpText += f"{command}\n"
     await ctx.send(helpText)
 
-bot.run('ODE0NjUzMTIyOTY1NDA1NzA4.YDg-2A.yzgF0rTRBtpM3wIAwNfpNinsWZ8')
+bot.run(cfg['discord']['apiKey'])
