@@ -77,8 +77,8 @@ async def editSummoner(ctx, summonerName: str):
 async def watchGame(ctx):
     """Tells Bot to watch next game of caller for points"""
     summonerId = dbHelper.getSummonerIdFromDiscordName(
-        ctx.message.author.display_name)
-    matchData = riotApi.findGame(summonerId)
+        ctx.message.author.display_name)['SummonerId']
+    matchData = riotApi.getActiveGameData(summonerId)
     print(matchData)
 
     # redTeam = []

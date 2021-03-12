@@ -1,6 +1,7 @@
 import requests
 import threading
 import time
+from waiting import wait, TimeoutExpired
 
 
 class RiotApi:
@@ -32,13 +33,11 @@ class RiotApi:
 
     def findGame(self, summonerId: str):
         game = GameWatcher(self._apiKey, summonerId, self._baseUrl)
+        wait(lambda: game._match, timeout_seconds=1200, sleep_seconds=30)
+        print("found match!")
+        return
 
-        while game._matchId == "":
-            break
-        print("found match?")
-        return game._matchId
-
-    def getActiveGame(self, summonerId: str):
+    def getActiveGameData(self, summonerId: str):
         self.findGame(summonerId)
         requestUrl = f"{self._baseUrl}spectator/v4/active-games/by-summoner/{summonerId}"
         response = requests.get(
@@ -65,15 +64,16 @@ class GameWatcher:
 
         self._apiKey = apiKey
         self._summonerId = summonerId
-        self._matchId = ""
+        self._match = False
+        self._matchData = None
         self._baseUrl = baseUrl
 
         @property
-        def matchId(self):
-            return self._matchId
+        def match(self):
+            return self._match
 
         self._timer = None
-        self.interval = 1
+        self.interval = 10
         self.is_running = False
         self.next_call = time.time()
         self.start()
@@ -88,7 +88,7 @@ class GameWatcher:
         print(response)
         if response.status_code == 200:
             self.stop()
-            self._matchId = response.json()['gameId']
+            self._match = True
             print("actually found the game :) ")
 
         else:
@@ -98,9 +98,14 @@ class GameWatcher:
         if not self.is_running:
             self.next_call += self.interval
             self._timer = threading.Timer(
-                self.next_call - time.time(), self.pingSpectator)
+                self.next_call - time.time(), self._run)
             self._timer.start()
             self.is_running = True
+
+    def _run(self):
+        self.is_running = False
+        self.start()
+        self.pingSpectator()
 
     def stop(self):
         self._timer.cancel()
